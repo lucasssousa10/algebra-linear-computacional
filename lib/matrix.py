@@ -134,52 +134,6 @@ class Matrix():
             d = d + 1        
         return Matrix(A)
 
-    def LU(self):
-        A = np.array(self.data)
-        m = self.data.shape[0]
-        n = self.data.shape[1]
-
-        p_n = np.zeros([1, n])
-
-        for i in range(0, n):
-            p_n[0][n] = i
-
-        for k in range(0, n):
-            pivo = A[k, k]
-            l_pivo = k
-            for i in range(k + 1, n):
-                if np.abs(A[i, k]) > np.abs(pivo):
-                    pivo = A[i, k]
-                    l_pivo = i
-            
-            if pivo == 0:
-                print("Erro - Matriz não eh singular.")
-                break
-
-            if l_pivo != k:
-                troca = p_n[k]
-                p_n[k] = p[l_pivo]
-                p[l_pivo] = troca
-
-                for j in range(n):
-                    troca = A[k, j]
-                    A[k, j] = A[l_pivo, j]
-                    A[l_pivo, j] = troca
-
-
-                for i in range(k, n):
-                    m = A[i, k] / A[k, k]
-                    A[i, k] = m
-
-                    for j in range(k, n):
-                        A[i, j] = A[i, j] - m * A[k, j]
-
-            
-
-
-
-
-
     # fatoração LU
 
     def fatoracao_lu(self):
@@ -260,3 +214,62 @@ class Matrix():
                 G[j, k] = (A[j, k] - s) / G[k, k]
 
         return Matrix(G), Matrix(G.T)
+
+    #ortogonalizacao gram-shmidt
+
+    def gram_shmidt(self):
+        A = np.array(self.data)
+        m = self.data.shape[0]
+        n = self.data.shape[1]
+        O = np.zeros([m, n])
+
+        O[:, 0] = A[:, 0] / np.linalg.norm(A[:, 0])
+
+        for i in range(1, n):
+            v = A[:, i]
+            for j in range(0, i):
+                prj = np.inner(A[:, i], O[:, j]) / np.inner(O[:, j], O[:, j])
+                v = v - prj * O[:, j]
+            O[:, i] = v / np.linalg.norm(v)
+        
+        return O
+
+    # reflexão de householder
+
+    def house_holder(self):
+        A = np.array(self.data)
+        m = self.data.shape[0]
+        n = self.data.shape[1]
+        QA = []
+        Q = []
+
+        for i in range(0, n-1):
+            M = []
+            x = []
+            if i == 0:
+                x = A[:, 0]
+            else:
+                M = QA[i:m-i+1, i:m-i+1]
+                x = M[:, 0]
+            e = np.zeros((1, m - i))
+            e[0, 0] = 1
+            e_n = np.linalg.norm(x) * e
+            
+            u = x.T - e[0, 0]*e_n
+            v = u / np.linalg.norm(u)
+            QA_i = np.eye(m-i) - 2*(np.matmul(v.T, v))
+
+            if i > 0:
+                Z = np.eye(m)
+                Z[i:m-i+1, i:m-i+1] = QA_i
+                QA = np.matmul(Z, QA)
+                Q = np.matmul(Z.T, Q)
+            else:
+                QA = np.matmul(QA_i, A)
+                Q = QA_i.T
+
+        for i in range(m):
+            for j in range(m):
+                if np.abs(QA[i, j]) < 1e-12:
+                    QA[i, j] = 0
+        return QA, Q.T

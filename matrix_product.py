@@ -1,8 +1,9 @@
 import numpy as np
 from lib.matrix import Matrix
 from lib.linear_system import gauss_elimination, gauss_elimination_reduction
+from lib.decompositions import QR_method_gram_sh, eign_qr_hh
 
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=5)
 
 a = np.array([[4, 3], [6, 3]]) # 2x2
 b = np.array([[3, 3, 1], [4, 5, 9]]) # 2x3
@@ -55,10 +56,16 @@ mg = Matrix(g)
 # print(md.data[:, -1])
 
 
-L, U, SW_lines = mg.fatoracao_lu()
-A = np.dot(L.data, U.data)[SW_lines, :]
-print(L.data)
-print()
-print(U.data)
-print(np.dot(L.data, U.data)[SW_lines, :])
-print(A)
+# HOUSE HOLDER
+T = np.array([[12, -51, 4], [6, 167, -68], [-4, 24, -41]])
+mt = Matrix(T)
+
+HH, Q = mt.house_holder()
+print(HH)
+print(Q)
+
+# print(np.matmul(Q, HH))
+
+D, eign = eign_qr_hh(mt)
+
+print(D)
