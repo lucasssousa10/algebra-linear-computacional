@@ -1,7 +1,7 @@
 import numpy as np
 from lib.matrix import Matrix
 from lib.linear_system import gauss_elimination, gauss_elimination_reduction
-from lib.decompositions import QR_method_gram_sh, eign_qr_hh
+from lib.decompositions import QR_method_gram_sh, eign_qr_hh, svd
 
 np.set_printoptions(precision=5)
 
@@ -60,12 +60,19 @@ mg = Matrix(g)
 T = np.array([[12, -51, 4], [6, 167, -68], [-4, 24, -41]])
 mt = Matrix(T)
 
-HH, Q = mt.house_holder()
-print(HH)
-print(Q)
+# HH, Q = mt.house_holder()
+# print(HH)
+# print(Q)
 
 # print(np.matmul(Q, HH))
 
-D, eign = eign_qr_hh(mt)
+# D, eign = eign_qr_hh(mt)
 
-print(D)
+# print(D)
+
+H = np.array([[1, 1], [0, 1]])
+mh = Matrix(H)
+
+U, S, V_t = svd(mt)
+print(mt.data)
+print(np.matmul(np.matmul(U, S), V_t))

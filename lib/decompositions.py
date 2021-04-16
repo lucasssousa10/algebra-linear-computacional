@@ -34,5 +34,22 @@ def eign_qr_hh(mtx):
         x = gauss_elimination(Matrix(A))
         x = x / np.linalg.norm(x)   
         D[:, i] = x
+        
+    return Q, eignval
 
-    return D, eignval
+def svd(mtx):
+    A = mtx.data
+    m = A.shape[0]
+    n = A.shape[1]
+
+    M = np.matmul(A, A.T)
+    U, eig_M = eign_qr_hh(Matrix(M))
+
+    S = np.eye(m)
+    for i in range(0, m):
+        S[i, i] = np.sqrt(np.abs(eig_M[i]))
+    
+    V = np.matmul(np.linalg.inv(S), U.T)
+    V = np.matmul(V, A)
+
+    return U, S, V
